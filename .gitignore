@@ -50,3 +50,6 @@ tmp
 temp
 .codex
 PROJECT_DOCUMENTATION.md
+# Python deployment helper caches
+**/__pycache__/
+**/*.pyc

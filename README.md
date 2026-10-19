@@ -16,7 +16,7 @@ bun run --cwd apps/web build
 bun run --cwd apps/web serve
 ```
 
-The web build generates client assets and the TanStack Start server in `apps/web/dist`. Deploy using a host that supports TanStack Start; the public site has not been deployed as part of this repository setup.
+The web build generates client assets and the TanStack Start server in `apps/web/dist`. The repository includes a production Dockerfile and GitHub Actions workflow for Docker Hub and Dokploy. See [deployment setup](docs/deployment.md) for the required Dokploy application, repository variables, and secrets.
 
 ## Appearance
 

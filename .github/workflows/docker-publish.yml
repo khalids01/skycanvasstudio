@@ -1,0 +1,83 @@
+name: Publish Docker image and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serialize publication/deployment so concurrent pushes cannot race on latest.
+concurrency:
+  group: skycanvasstudio-production
+  cancel-in-progress: false
+
+env:
+  IMAGE: khalids01/skycanvasstudio
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Check deployment script
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+
+      - name: Check Docker Hub token
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: ': "${DOCKERHUB_TOKEN:?Add the DOCKERHUB_TOKEN repository Actions secret}"'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build image for smoke checks
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: skycanvasstudio:check
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Check production container
+        run: bash scripts/smoke-container.sh skycanvasstudio:check
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: khalids01
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish checked image
+        run: |
+          docker tag skycanvasstudio:check "$IMAGE:latest"
+          docker tag skycanvasstudio:check "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:latest"
+          printf 'Published `%s:latest` and `%s:sha-%s`.\n' "$IMAGE" "$IMAGE" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out deployment script
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Trigger Dokploy application deployment
+        env:
+          DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_APPLICATION_ID: ${{ vars.DOKPLOY_APPLICATION_ID }}
+        run: python3 scripts/deploy-dokploy.py

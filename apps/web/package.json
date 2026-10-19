@@ -5,6 +5,7 @@
   "scripts": {
     "build": "vite build",
     "serve": "vite preview",
+    "start": "bun run server.ts",
     "dev": "vite dev",
     "check-boundaries": "bun run scripts/check-boundaries.ts"
   },
