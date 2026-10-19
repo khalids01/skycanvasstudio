@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowDown,
@@ -12,6 +13,8 @@ import {
   HardDrive,
   Layers3,
   Menu,
+  Moon,
+  Sun,
   Search,
   ShieldCheck,
   Sparkles,
@@ -33,6 +36,25 @@ function Brand() {
     </a>
   );
 }
+function StudioThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = !mounted || resolvedTheme === "dark";
+  return (
+    <button
+      type="button"
+      className="studio-theme-toggle"
+      disabled={!mounted}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      title={`Switch to ${isDark ? "light" : "dark"} mode`}
+    >
+      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+}
+
 export function StudioLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
@@ -68,9 +90,12 @@ export function StudioLayout({ children }: { children: React.ReactNode }) {
             GitHub <ArrowUpRight size={13} />
           </a>
         </nav>
-        <a className="nav-cta" href="/#products">
-          Find your next tool <ArrowUpRight size={15} />
-        </a>
+        <div className="nav-actions">
+          <StudioThemeToggle />
+          <a className="nav-cta" href="/#products">
+            Find your next tool <ArrowUpRight size={15} />
+          </a>
+        </div>
       </header>
       {children}
       <footer className="studio-footer wrap">

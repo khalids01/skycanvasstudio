@@ -18,6 +18,10 @@ bun run --cwd apps/web serve
 
 The web build generates client assets and the TanStack Start server in `apps/web/dist`. Deploy using a host that supports TanStack Start; the public site has not been deployed as part of this repository setup.
 
+## Appearance
+
+Dark mode is the default, regardless of the operating system theme. The header includes a light/dark toggle on desktop and mobile; the existing theme provider saves the visitor’s selection in local storage.
+
 ## Product catalog
 
 - `/` — shared company landing page, software catalog, studio philosophy, and FAQs.

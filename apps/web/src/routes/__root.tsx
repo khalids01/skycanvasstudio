@@ -36,7 +36,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content:
           "Thoughtful software for everyday work. Explore DiskVacuum, Job Agent, and the growing toolbox from SkyCanvas Studio.",
       },
-      { name: "theme-color", content: "#f8f9f5" },
+      { name: "theme-color", content: "#141b17" },
     ],
   }),
   loader: async ({ location }) => {
@@ -63,7 +63,12 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
           {isMarketing ? (
             <Outlet />
           ) : (

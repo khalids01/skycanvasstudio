@@ -1451,3 +1451,256 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Shared theme controls stay available in the mobile header. */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.studio-theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.studio-theme-toggle:hover {
+  background: var(--mint);
+}
+.studio-theme-toggle:disabled {
+  cursor: wait;
+}
+
+/* Dark surfaces retain the studio's sage and warm copper palette. */
+.dark .studio {
+  --ink: #e4eade;
+  --muted: #acb6a8;
+  --paper: #141b17;
+  --line: #344035;
+  --mint: #28392b;
+  --peach: #3d3026;
+  color-scheme: dark;
+}
+.dark .studio em {
+  color: #b3c797;
+}
+.dark .studio a:focus-visible,
+.dark .studio button:focus-visible,
+.dark .studio summary:focus-visible {
+  outline-color: #b3c797;
+}
+.dark .studio .skip-link {
+  background: #28392b;
+}
+.dark .studio .brand-mark {
+  background: #2e3c2b;
+}
+.dark .studio .nav-links a:hover,
+.dark .studio .text-link:hover,
+.dark .studio .product-card-bottom > a:hover {
+  color: #c0d6a2;
+}
+.dark .studio .nav-cta {
+  border-color: var(--line);
+}
+.dark .studio .button-dark {
+  background: #c0d3a7;
+  color: #192319 !important;
+}
+.dark .studio .button-dark:hover {
+  background: #d2e2bc;
+}
+.dark .studio .hero-footnote,
+.dark .studio .more-tools p,
+.dark .studio .product-card-bottom > span,
+.dark .studio .footer-top > div:first-child > p,
+.dark .studio .footer-top .eyebrow,
+.dark .studio .footer-bottom {
+  color: #a3af9a;
+}
+.dark .studio .hero-art {
+  background: radial-gradient(ellipse at center, #536b3630, transparent 68%);
+}
+.dark .studio .orbit {
+  border-color: #485640;
+}
+.dark .studio .art-tile {
+  border-color: #ffffff15;
+  box-shadow: 0 18px 30px -18px #0008;
+}
+.dark .studio .tile-disk {
+  background: #3c5331;
+}
+.dark .studio .tile-job {
+  background: #63472f;
+}
+.dark .studio .tile-next {
+  background: #283026;
+  border-color: #5b694d;
+}
+.dark .studio .tile-next > span,
+.dark .studio .art-star,
+.dark .studio .more-symbol,
+.dark .studio .principle > svg,
+.dark .studio .faq-section > div > svg,
+.dark .studio .tiny-star {
+  color: #b0c392;
+}
+.dark .studio .tile-next small,
+.dark .studio .note-bottom {
+  color: #b8c2a9;
+}
+.dark .studio .floating-note {
+  background: #202a21e6;
+  border-color: #3a4734;
+  box-shadow: 0 5px 20px #0002;
+}
+.dark .studio .note-bottom {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.dark .studio .values-strip {
+  background: #1d271e;
+}
+.dark .studio .values-strip span {
+  color: #bac6ad;
+}
+.dark .studio .values-strip svg {
+  color: #a5bb8b;
+}
+.dark .studio .product-card {
+  background: #1b241d;
+  border-color: var(--line);
+}
+.dark .studio .visual-top {
+  color: #c4cfb8;
+}
+.dark .studio .product-category {
+  border-color: #869b6c66;
+}
+.dark .studio .app-window {
+  background: #1c251e;
+  border-color: #4b5944;
+  color: #dce5d3;
+  box-shadow: 0 15px 30px #0003;
+}
+.dark .studio .window-bar,
+.dark .studio .disk-body aside {
+  background: #222e23;
+  border-color: #3b4935;
+}
+.dark .studio .window-dots i {
+  background: #6d7f5b;
+}
+.dark .studio .preview-label,
+.dark .studio .storage-line small,
+.dark .studio .storage-line > span {
+  color: #a0b08e;
+}
+.dark .studio .sidebar-active {
+  background: #3b5030;
+}
+.dark .studio .sidebar-bottom,
+.dark .studio .preview-note,
+.dark .studio .illustration-caption {
+  color: #aebf9a;
+}
+.dark .studio .storage-meter {
+  background: #35452d;
+}
+.dark .studio .treemap > div {
+  background: #60794b;
+  color: #f0f6e8;
+}
+.dark .studio .treemap > div:first-child {
+  background: #526c3e;
+}
+.dark .studio .treemap > div:nth-child(2) {
+  background: #405d34;
+}
+.dark .studio .treemap > div:nth-child(3) {
+  background: #6a583c;
+}
+.dark .studio .treemap b {
+  opacity: 0.9;
+}
+.dark .studio .job-window {
+  border-color: #64503f;
+}
+.dark .studio .job-window .window-bar {
+  background: #30271f;
+}
+.dark .studio .job-avatar {
+  background: #6d5237;
+}
+.dark .studio .job-toolbar div > span,
+.dark .studio .job-row div > span {
+  color: #b5b5a5;
+}
+.dark .studio .profile-pill,
+.dark .studio .job-tag {
+  background: #34412d;
+  color: #d3dfc6;
+}
+.dark .studio .job-tabs,
+.dark .studio .job-row {
+  border-color: #3f3b2f;
+}
+.dark .studio .job-tabs {
+  color: #b6b29f;
+}
+.dark .studio .job-tabs > span:first-child {
+  color: #c7d8ad;
+  border-color: #a6c082;
+}
+.dark .studio .job-tabs b {
+  background: #3b4d2c;
+}
+.dark .studio .purple {
+  background: #42334f;
+  color: #d5b8ea;
+}
+.dark .studio .orange {
+  background: #523b24;
+  color: #e4bd8d;
+}
+.dark .studio .green {
+  background: #34472b;
+  color: #b7cf91;
+}
+.dark .studio .job-row > svg {
+  color: #b4bba4;
+}
+.dark .studio .status-badge {
+  color: #d6e2c8;
+}
+.dark .studio .status-badge.peach {
+  color: #e8cdb4;
+}
+.dark .studio .status-badge span {
+  background: #b8d596;
+}
+.dark .studio .principle > span {
+  color: #acb99b;
+}
+.dark .studio .faqs summary > span {
+  color: #b0c393;
+}
+.dark .studio .closing {
+  background: #263521;
+  border-color: #415334;
+}
+.dark .studio .closing-star,
+.dark .studio .closing-arrow {
+  color: #91a775;
+}
+.dark .studio .detail-notes {
+  background: #222d21;
+}
