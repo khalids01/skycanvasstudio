@@ -17,20 +17,20 @@ class DeploymentTests(unittest.TestCase):
         self.settings = {
             "DOKPLOY_URL": "https://deploy.example.com/",
             "DOKPLOY_API_KEY": "test-only-key",
-            "DOKPLOY_APPLICATION_ID": "studio-app",
+            "DOKPLOY_COMPOSE_ID": "studio-compose",
             "GITHUB_SHA": "abcdef1234567890",
         }
         self.opener = MagicMock()
         self.opener.open.return_value.__enter__.return_value.status = 200
 
-    def test_targets_application_deploy_with_auth_and_timeout(self):
+    def test_targets_compose_deploy_with_auth_and_timeout(self):
         with redirect_stdout(StringIO()):
             self.assertTrue(module.deploy(self.settings, opener=self.opener))
         request = self.opener.open.call_args.args[0]
-        self.assertEqual(request.full_url, "https://deploy.example.com/api/application.deploy")
+        self.assertEqual(request.full_url, "https://deploy.example.com/api/compose.deploy")
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.get_header("X-api-key"), "test-only-key")
-        self.assertEqual(json.loads(request.data)["applicationId"], "studio-app")
+        self.assertEqual(json.loads(request.data)["composeId"], "studio-compose")
         self.assertEqual(self.opener.open.call_args.kwargs["timeout"], 30)
 
     def test_missing_settings_never_send_a_request(self):

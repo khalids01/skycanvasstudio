@@ -75,9 +75,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Trigger Dokploy application deployment
+      - name: Trigger Dokploy Compose deployment
         env:
           DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
           DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
-          DOKPLOY_APPLICATION_ID: ${{ vars.DOKPLOY_APPLICATION_ID }}
+          DOKPLOY_COMPOSE_ID: ${{ vars.DOKPLOY_COMPOSE_ID }}
         run: python3 scripts/deploy-dokploy.py

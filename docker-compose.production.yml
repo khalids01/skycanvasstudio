@@ -1,0 +1,11 @@
+services:
+  web:
+    image: khalids01/skycanvasstudio:latest
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3000"
+    expose:
+      - "3000"

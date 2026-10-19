@@ -1,4 +1,4 @@
-"""Trigger application deployment after publication; never print deployment credentials."""
+"""Trigger Compose deployment after publication; never print deployment credentials."""
 
 import json
 import os
@@ -6,7 +6,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-SETTINGS = ("DOKPLOY_URL", "DOKPLOY_API_KEY", "DOKPLOY_APPLICATION_ID")
+SETTINGS = ("DOKPLOY_URL", "DOKPLOY_API_KEY", "DOKPLOY_COMPOSE_ID")
 
 
 class NoRedirects(HTTPRedirectHandler):
@@ -20,7 +20,7 @@ def deploy(environ=None, *, opener=None):
     values = {name: environ.get(name, "").strip() for name in SETTINGS}
     if not all(values.values()):
         raise RuntimeError(
-            "Set the DOKPLOY_URL and DOKPLOY_APPLICATION_ID Actions variables, plus the DOKPLOY_API_KEY secret "
+            "Set the DOKPLOY_URL and DOKPLOY_COMPOSE_ID Actions variables, plus the DOKPLOY_API_KEY secret "
             "in repository settings"
         )
     parts = urlsplit(values["DOKPLOY_URL"])
@@ -35,11 +35,11 @@ def deploy(environ=None, *, opener=None):
     ):
         raise RuntimeError("DOKPLOY_URL must be the HTTPS origin of your Dokploy dashboard")
     payload = {
-        "applicationId": values["DOKPLOY_APPLICATION_ID"],
+        "composeId": values["DOKPLOY_COMPOSE_ID"],
         "title": "Published studio image " + environ.get("GITHUB_SHA", "")[:12],
     }
     request = Request(
-        values["DOKPLOY_URL"].rstrip("/") + "/api/application.deploy",
+        values["DOKPLOY_URL"].rstrip("/") + "/api/compose.deploy",
         data=json.dumps(payload).encode(),
         headers={
             "Content-Type": "application/json",
