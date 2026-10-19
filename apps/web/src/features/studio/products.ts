@@ -1,7 +1,7 @@
 export const products = [
   {
     slug: "disk-vacuum",
-    name: "DiskVacuum",
+    name: "Disk Vacuum",
     category: "Storage & cleanup",
     status: "Early access",
     tone: "mint",
