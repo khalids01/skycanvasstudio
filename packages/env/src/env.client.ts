@@ -10,10 +10,10 @@ export const env = createEnv({
       .default("better-auth.session_token"),
   },
   client: {
-    VITE_SERVER_URL: z.url(),
+    VITE_SERVER_URL: z.url().default("http://localhost:3000"),
     VITE_ENABLE_POLAR: z
       .string()
-      .default("true")
+      .default("false")
       .transform((val) => val === "true"),
     VITE_OWNER_SETUP_CHECK: z
       .string()

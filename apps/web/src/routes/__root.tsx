@@ -1,5 +1,6 @@
 import {
   HeadContent,
+  useRouterState,
   Outlet,
   Scripts,
   createRootRouteWithContext,
@@ -18,6 +19,7 @@ export interface RouterAppContext {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
+    links: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
     meta: [
       {
         charSet: "utf-8",
@@ -27,11 +29,19 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Saas Starter",
+        title: "SkyCanvas Studio — Small tools. More possibility.",
       },
+      {
+        name: "description",
+        content:
+          "Thoughtful software for everyday work. Explore DiskVacuum, Job Agent, and the growing toolbox from SkyCanvas Studio.",
+      },
+      { name: "theme-color", content: "#f8f9f5" },
     ],
   }),
-  loader: async () => {
+  loader: async ({ location }) => {
+    if (location.pathname === "/" || location.pathname.startsWith("/products/"))
+      return { session: null };
     const session = await getRootSession();
     return { session: session ?? null };
   },
@@ -43,6 +53,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   const { session } = Route.useLoaderData();
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const isMarketing = pathname === "/" || pathname.startsWith("/products/");
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -50,13 +64,17 @@ function RootDocument() {
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SessionProvider initialSession={session}>
-            <TanstackQueryProvider>
-              <Outlet />
-            </TanstackQueryProvider>
-          </SessionProvider>
-          <VisitorTracker />
-          <Toaster richColors position="top-center"/>
+          {isMarketing ? (
+            <Outlet />
+          ) : (
+            <SessionProvider initialSession={session}>
+              <TanstackQueryProvider>
+                <Outlet />
+              </TanstackQueryProvider>
+            </SessionProvider>
+          )}
+          {!isMarketing && <VisitorTracker />}
+          <Toaster richColors position="top-center" />
           {/* {isDevelopment && <TanStackRouterDevtools position="bottom-left" />} */}
         </ThemeProvider>
         <Scripts />

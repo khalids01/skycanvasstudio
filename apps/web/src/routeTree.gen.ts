@@ -36,6 +36,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthAuthCompleteRouteImport } from './routes/_auth/auth-complete'
 import { Route as AdminRolesRoleIdRouteImport } from './routes/admin/roles/$roleId'
+import { Route as PublicProductsSlugRouteImport } from './routes/_public/products/$slug'
 
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
@@ -171,6 +172,11 @@ const AdminRolesRoleIdRoute = AdminRolesRoleIdRouteImport.update({
   path: '/$roleId',
   getParentRoute: () => AdminRolesRoute,
 } as any)
+const PublicProductsSlugRoute = PublicProductsSlugRouteImport.update({
+  id: '/_public/products/$slug',
+  path: '/products/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/admin/': typeof AdminIndexRoute
+  '/products/$slug': typeof PublicProductsSlugRoute
   '/admin/roles/$roleId': typeof AdminRolesRoleIdRoute
 }
 export interface FileRoutesByTo {
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/admin': typeof AdminIndexRoute
+  '/products/$slug': typeof PublicProductsSlugRoute
   '/admin/roles/$roleId': typeof AdminRolesRoleIdRoute
 }
 export interface FileRoutesById {
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/payment/success': typeof PaymentSuccessRoute
   '/_public/': typeof PublicIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/_public/products/$slug': typeof PublicProductsSlugRoute
   '/admin/roles/$roleId': typeof AdminRolesRoleIdRoute
 }
 export interface FileRouteTypes {
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin/webhooks'
     | '/payment/success'
     | '/admin/'
+    | '/products/$slug'
     | '/admin/roles/$roleId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/admin/webhooks'
     | '/payment/success'
     | '/admin'
+    | '/products/$slug'
     | '/admin/roles/$roleId'
   id:
     | '__root__'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/payment/success'
     | '/_public/'
     | '/admin/'
+    | '/_public/products/$slug'
     | '/admin/roles/$roleId'
   fileRoutesById: FileRoutesById
 }
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   AuthTwoFactorRoute: typeof AuthTwoFactorRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicProductsSlugRoute: typeof PublicProductsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -551,6 +564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRolesRoleIdRouteImport
       parentRoute: typeof AdminRolesRoute
     }
+    '/_public/products/$slug': {
+      id: '/_public/products/$slug'
+      path: '/products/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof PublicProductsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -624,6 +644,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthTwoFactorRoute: AuthTwoFactorRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicProductsSlugRoute: PublicProductsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
