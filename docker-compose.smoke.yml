@@ -1,0 +1,40 @@
+# Test-only overrides. Production PostgreSQL/Redis are managed separately in Dokploy.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: smoke
+      POSTGRES_PASSWORD: smoke-test-only
+      POSTGRES_DB: skycanvas_smoke
+    networks: [dokploy-network]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smoke -d skycanvas_smoke"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:7-alpine
+    networks: [dokploy-network]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate:
+    pull_policy: never
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    pull_policy: never
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports: ["127.0.0.1::3000"]
+  web:
+    pull_policy: never
+    ports: ["127.0.0.1::3001"]
+networks:
+  dokploy-network:
+    external: false
+    name: ${COMPOSE_PROJECT_NAME}-network

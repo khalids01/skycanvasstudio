@@ -1,4 +1,5 @@
 import { cors } from "@elysiajs/cors";
+import prisma from "@db/server";
 import { handleAuthRequest } from "@auth/server";
 import { env } from "@env/server";
 import { connectRedis } from "@redis/server";
@@ -41,21 +42,38 @@ const server = new Elysia()
     console.log(`[Server] ${request.method} ${pathname}`);
   })
   .onBeforeHandle((context) => {
+    const path = new URL(context.request.url).pathname;
+    if (path === "/health/live" || path === "/health/ready") return;
     return enforceRateLimit(context as any);
   })
-  .all("/api/auth/*", async (context) => {
-    const { request, status } = context;
-    if (["POST", "GET"].includes(request.method)) {
-      return handleAuthRequest(request);
-    }
-    return status(405);
-  }, {
-    parse: "none",
-  })
+  .all(
+    "/api/auth/*",
+    async (context) => {
+      const { request, status } = context;
+      if (["POST", "GET"].includes(request.method)) {
+        return handleAuthRequest(request);
+      }
+      return status(405);
+    },
+    {
+      parse: "none",
+    },
+  )
   .use(app)
+  .get("/health/live", () => ({ status: "ok" }))
+  .get("/health/ready", async ({ set }) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      await (await connectRedis()).ping();
+      return { status: "ok" };
+    } catch {
+      set.status = 503;
+      return { status: "unavailable" };
+    }
+  })
   .get("/", () => "OK")
-  .listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+  .listen({ hostname: env.HOST, port: env.PORT }, () => {
+    console.log(`Server is running on ${env.HOST}:${env.PORT}`);
   });
 
 export type App = typeof server;

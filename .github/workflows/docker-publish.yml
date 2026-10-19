@@ -1,4 +1,4 @@
-name: Publish Docker image and deploy
+name: Publish Docker images and deploy
 
 on:
   push:
@@ -8,19 +8,18 @@ on:
 permissions:
   contents: read
 
-# Serialize publication/deployment so concurrent pushes cannot race on latest.
 concurrency:
   group: skycanvasstudio-production
   cancel-in-progress: false
 
 env:
-  IMAGE: khalids01/skycanvasstudio
+  IMAGE_REPOSITORY: khalids01/skycanvasstudio
 
 jobs:
   publish:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Check out source
         uses: actions/checkout@v7
@@ -30,26 +29,47 @@ jobs:
       - name: Check deployment script
         run: python3 -m unittest discover -s scripts -p 'test_*.py'
 
-      - name: Check Docker Hub token
+      - name: Validate publication settings
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: ': "${DOCKERHUB_TOKEN:?Add the DOCKERHUB_TOKEN repository Actions secret}"'
+          VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
+        run: |
+          : "${DOCKERHUB_TOKEN:?Add the DOCKERHUB_TOKEN Actions secret}"
+          : "${VITE_SERVER_URL:?Set VITE_SERVER_URL to the public HTTPS API origin in Actions variables}"
+          python3 -c 'import os; from urllib.parse import urlsplit; u=urlsplit(os.environ["VITE_SERVER_URL"]); assert u.scheme == "https" and u.hostname and not (u.username or u.password or u.query or u.fragment) and u.path in ("", "/"), "VITE_SERVER_URL must be a public HTTPS origin"'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build image for smoke checks
+      - name: Build API and migration image
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: docker/api.Dockerfile
           load: true
-          tags: skycanvasstudio:check
+          tags: ${{ env.IMAGE_REPOSITORY }}:api-check
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
 
-      - name: Check production container
-        run: bash scripts/smoke-container.sh skycanvasstudio:check
+      - name: Build web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_REPOSITORY }}:web-check
+          platforms: linux/amd64
+          build-args: |
+            VITE_SERVER_URL=${{ vars.VITE_SERVER_URL }}
+            VITE_ENABLE_POLAR=${{ vars.VITE_ENABLE_POLAR || 'false' }}
+            VITE_OWNER_SETUP_CHECK=${{ vars.VITE_OWNER_SETUP_CHECK || 'false' }}
+            AUTH_SESSION_COOKIE_NAME=${{ vars.AUTH_SESSION_COOKIE_NAME || 'skycanvasstudio.session_token' }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      - name: Check migrations, API, and web with disposable databases
+        run: bash scripts/smoke-stack.sh
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
@@ -57,13 +77,17 @@ jobs:
           username: khalids01
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Publish checked image
+      - name: Publish checked release images, then update deployment tags
         run: |
-          docker tag skycanvasstudio:check "$IMAGE:latest"
-          docker tag skycanvasstudio:check "$IMAGE:sha-$GITHUB_SHA"
-          docker push "$IMAGE:sha-$GITHUB_SHA"
-          docker push "$IMAGE:latest"
-          printf 'Published `%s:latest` and `%s:sha-%s`.\n' "$IMAGE" "$IMAGE" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          for service in api web; do
+            docker tag "$IMAGE_REPOSITORY:$service-check" "$IMAGE_REPOSITORY:$service-sha-$GITHUB_SHA"
+            docker push "$IMAGE_REPOSITORY:$service-sha-$GITHUB_SHA"
+          done
+          for service in api web; do
+            docker tag "$IMAGE_REPOSITORY:$service-check" "$IMAGE_REPOSITORY:$service-main"
+            docker push "$IMAGE_REPOSITORY:$service-main"
+          done
+          printf 'Published API and web images. Dokploy: `IMAGE_TAG=sha-%s` (pinned) or `IMAGE_TAG=main` (automatic updates).\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     needs: publish

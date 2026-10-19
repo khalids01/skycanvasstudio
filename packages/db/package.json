@@ -2,8 +2,11 @@
   "name": "@db",
   "type": "module",
   "exports": {
-    ".": "./src/server/index.ts",
-    "./*": "./src/*.ts"
+    ".": "./src/index.server.ts",
+    "./*": "./src/*.ts",
+    "./server": "./src/index.server.ts",
+    "./server/rbac/keys": "./src/rbac/keys.ts",
+    "./server/*": "./src/*.server.ts"
   },
   "scripts": {
     "db:reset": "prisma migrate reset",
@@ -11,7 +14,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "bun --env-file=../../apps/server/.env run prisma/seed/rbac.ts",
-    "db:make-owner": "bun run scripts/make-owner.ts"
+    "db:make-owner": "bun run scripts/make-owner.ts",
+    "db:migrate:deploy": "prisma migrate deploy"
   },
   "devDependencies": {
     "@config": "workspace:*",

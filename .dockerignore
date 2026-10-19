@@ -15,3 +15,7 @@ docs
 # Python deployment helper caches
 **/__pycache__/
 **/*.pyc
+
+# Database clients are generated inside the API build.
+**/prisma/generated
+**/*.tsbuildinfo

@@ -16,7 +16,7 @@ bun run --cwd apps/web build
 bun run --cwd apps/web serve
 ```
 
-The web build generates client assets and the TanStack Start server in `apps/web/dist`. The repository includes a production Dockerfile and GitHub Actions workflow for Docker Hub and Dokploy. See [deployment setup](docs/deployment.md) for the required Dokploy Compose service, repository variables, and secrets.
+The web build generates client assets and the TanStack Start server in `apps/web/dist`. The repository includes production API/web Dockerfiles and a GitHub Actions workflow for Docker Hub and Dokploy. See [deployment setup](docs/deployment.md) for the required Dokploy Compose service, repository variables, and secrets.
 
 ## Appearance
 
@@ -32,8 +32,10 @@ Product copy, release URLs, and availability live in `apps/web/src/features/stud
 
 Shared components and styles live in `apps/web/src/features/studio/`. Product details use the typed dynamic route `apps/web/src/routes/_public/products/$slug.tsx`.
 
-## Future accounts and monetization
+## Backend and deployment
 
-The starter's auth, admin, server, database, and billing modules are retained for later work. They are not required by the marketing pages. Public pages skip session requests and visitor tracking. Polar is disabled by default; enable it explicitly with `VITE_ENABLE_POLAR=true` once billing is configured. No paid plans or shared product subscriptions are currently offered by this site.
+The deployment includes the starter's API, auth, admin, and billing modules alongside the web app. Billing is disabled by default. `docker-compose.production.yml` runs `web` (3001), `api` (3000), and a one-shot `migrate` container that must succeed before either app starts. Provision PostgreSQL and Redis separately in Dokploy, as in ts-starter's ecommerce deployment.
 
-`VITE_SERVER_URL` defaults to `http://localhost:3000` for the retained application features. Set it to your API origin when configuring them; server features also require their own environment and infrastructure. The inherited workspace has existing TypeScript errors in backend modules; the public web production build succeeds independently.
+GitHub Actions publishes matching `web-*` and `api-*` images in `khalids01/skycanvasstudio`, then triggers Dokploy Compose deployment. See [deployment setup](docs/deployment.md) and [.env.production.example](.env.production.example) for build variables, runtime credentials, domains, migration behavior, and explicit owner/RBAC setup.
+
+Public marketing pages still work without an API in local development. Accounts/admin routes require the configured backend. The inherited workspace has existing TypeScript errors in backend modules; production builds and the full stack smoke checks are the deployment checks.

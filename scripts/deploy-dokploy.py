@@ -36,7 +36,7 @@ def deploy(environ=None, *, opener=None):
         raise RuntimeError("DOKPLOY_URL must be the HTTPS origin of your Dokploy dashboard")
     payload = {
         "composeId": values["DOKPLOY_COMPOSE_ID"],
-        "title": "Published studio image " + environ.get("GITHUB_SHA", "")[:12],
+        "title": "Published studio release " + environ.get("GITHUB_SHA", "")[:12],
     }
     request = Request(
         values["DOKPLOY_URL"].rstrip("/") + "/api/compose.deploy",

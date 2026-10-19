@@ -1,11 +1,58 @@
+# Provision PostgreSQL and Redis separately in Dokploy, as in ts-starter ecommerce.
 services:
+  migrate:
+    image: khalids01/skycanvasstudio:api-${IMAGE_TAG:?Set IMAGE_TAG}
+    pull_policy: always
+    restart: "no"
+    healthcheck:
+      disable: true
+    command: ["bun", "--bun", "run", "--cwd", "packages/db", "db:migrate:deploy"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
+    networks:
+      - dokploy-network
+
   web:
-    image: khalids01/skycanvasstudio:latest
+    image: khalids01/skycanvasstudio:web-${IMAGE_TAG:?Set IMAGE_TAG}
     pull_policy: always
     restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3001"
+      VITE_SERVER_URL: ${VITE_SERVER_URL:?Set VITE_SERVER_URL}
+      VITE_ENABLE_POLAR: ${VITE_ENABLE_POLAR:-false}
+      VITE_OWNER_SETUP_CHECK: ${VITE_OWNER_SETUP_CHECK:-false}
+      AUTH_SESSION_COOKIE_NAME: ${AUTH_SESSION_COOKIE_NAME:-skycanvasstudio.session_token}
+    expose:
+      - "3001"
+    networks:
+      - dokploy-network
+    stop_grace_period: 35s
+
+  api:
+    image: khalids01/skycanvasstudio:api-${IMAGE_TAG:?Set IMAGE_TAG}
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - ${API_ENV_FILE:-.env}
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: "3000"
     expose:
       - "3000"
+    networks:
+      - dokploy-network
+    stop_grace_period: 35s
+
+networks:
+  dokploy-network:
+    external: true

@@ -4,9 +4,11 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
+    HOST: z.string().default("0.0.0.0"),
+    PORT: z.coerce.number().int().min(1).max(65535).default(3000),
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().url(),
-    REDIS_KEY_PREFIX: z.string().default("ts-starter:"),
+    REDIS_KEY_PREFIX: z.string().default("skycanvasstudio:"),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     GITHUB_CLIENT_ID: z.string().min(1),
@@ -15,7 +17,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().min(1),
     DISCORD_CLIENT_ID: z.string().min(1),
     DISCORD_CLIENT_SECRET: z.string().min(1),
-    AUTH_SESSION_COOKIE_NAME: z.string().min(1).default("better-auth.session_token"),
+    AUTH_SESSION_COOKIE_NAME: z
+      .string()
+      .min(1)
+      .default("better-auth.session_token"),
     AUTH_COOKIE_DOMAIN: z.string().min(1).optional(),
     POLAR_ACCESS_TOKEN: z.string().optional(),
     POLAR_WEBHOOK_SECRET: z.string().optional(),
